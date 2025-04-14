@@ -1,0 +1,44 @@
+# Stuff to ignore for our DCA project
+
+# Local dev environment
+.dfx/
+node_modules/
+dist/
+src/declarations/
+
+# Don't commit large model files - they're too big for GitHub!
+/model_files/
+/model_assets/
+*.onnx
+*.pth
+*.safetensors
+tokenizer_*.json
+
+# Secrets and configs
+.env
+.env.local
+# TODO: add more env files if needed
+
+# Editor junk
+.vscode/
+.idea/
+# Fred uses emacs, ignore those too
+*~
+*.swp
+.build/
+# I hate .DS_Store files
+.DS_Store
+
+# Debug stuff
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Random temp files
+*.tmp
+*.bak
+.cache/
+
+# Why do these keep appearing?
+.dfx.json
+.webpack.cache 

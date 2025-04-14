@@ -1,0 +1,61 @@
+type UserId = principal;
+type Timestamp = int;
+type Asset = text;
+type Amount = float64;
+type Price = float64;
+
+type ActionType = variant {
+    BUY;
+    HOLD;
+};
+
+type Deposit = record {
+    user: UserId;
+    amount: Amount;
+    timestamp: Timestamp;
+};
+
+type Trade = record {
+    user: UserId;
+    sourceAsset: Asset;
+    targetAsset: Asset;
+    sourceAmount: Amount;
+    targetAmount: Amount;
+    price: Price;
+    timestamp: Timestamp;
+};
+
+type ActionLog = record {
+    user: UserId;
+    action: ActionType;
+    asset: Asset;
+    amount: opt Amount;
+    reason: text;
+    timestamp: Timestamp;
+};
+
+service : {
+    // Deposit ICP into the agent
+    deposit: (amount: Amount) -> (text);
+    
+    // Get user balance
+    getBalance: query () -> (Amount);
+    
+    // Execute the DCA strategy
+    executeDCA: (targetAsset: Asset, dcaAmount: Amount) -> (text);
+    
+    // Update price data (simulated)
+    updatePriceData: (asset: Asset, newPrice: Price) -> ();
+    
+    // Get current price for an asset
+    getCurrentPrice: query (asset: Asset) -> (opt Price);
+    
+    // Get action logs for a user
+    getUserActionLogs: query () -> (vec ActionLog);
+    
+    // Get all trades for a user
+    getUserTrades: query () -> (vec Trade);
+    
+    // Admin function to get all action logs
+    getAllActionLogs: query () -> (vec ActionLog);
+} 

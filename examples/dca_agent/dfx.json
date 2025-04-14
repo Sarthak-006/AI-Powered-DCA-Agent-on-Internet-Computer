@@ -1,0 +1,30 @@
+{
+    "canisters": {
+        "dca_agent": {
+            "main": "src/backend/main.mo",
+            "type": "motoko",
+            "candid": "src/backend/dca_agent.did"
+        },
+        "dca_agent_assets": {
+            "dependencies": [
+                "dca_agent"
+            ],
+            "frontend": {
+                "entrypoint": "src/frontend/index.html"
+            },
+            "source": [
+                "src/frontend/assets",
+                "dist/dca_agent_assets/"
+            ],
+            "type": "assets"
+        }
+    },
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": ""
+        }
+    },
+    "output_env_file": ".env",
+    "version": 1
+}

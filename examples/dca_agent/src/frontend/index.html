@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCA Agent - ICP Autonomous Investing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding-top: 2rem;
+            color: #333;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #5843be;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+
+        /* Make buttons match our color scheme */
+        .btn-primary {
+            background-color: #5843be;
+            border-color: #5843be;
+        }
+
+        .btn-primary:hover {
+            background-color: #4a3aa8;
+            border-color: #4a3aa8;
+        }
+
+        /* Fix for table overflow */
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .price-card {
+            text-align: center;
+        }
+
+        .price-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .asset-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Added this for better mobile responsive layout */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Notification element styles */
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 300px;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">AI-Powered DCA Agent</h1>
+        <p class="text-center mb-5">Autonomous, onchain investing powered by AI and secured by the Internet Computer.
+        </p>
+
+        <!-- Notification area for alerts -->
+        <div id="notification" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span id="notification-message"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Price tiles -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card price-card">
+                    <div class="card-body">
+                        <div class="asset-icon">₿</div>
+                        <h5 class="card-title">Bitcoin</h5>
+                        <p class="price-value" id="btc-price">--</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card price-card">
+                    <div class="card-body">
+                        <div class="asset-icon">Ξ</div>
+                        <h5 class="card-title">Ethereum</h5>
+                        <p class="price-value" id="eth-price">--</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card price-card">
+                    <div class="card-body">
+                        <div class="asset-icon">⟁</div>
+                        <h5 class="card-title">Internet Computer</h5>
+                        <p class="price-value" id="icp-price">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left column - forms -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Deposit ICP
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="deposit-amount" class="form-label">Amount (ICP)</label>
+                            <input type="number" class="form-control" id="deposit-amount" min="0.1" step="0.1"
+                                placeholder="Enter amount...">
+                        </div>
+                        <button class="btn btn-primary" id="deposit-btn">Deposit</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        Execute DCA Strategy
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="dca-asset" class="form-label">Target Asset</label>
+                            <select class="form-select" id="dca-asset">
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <!-- TODO: Add more assets when supported -->
+                                <!-- <option value="SOL">Solana (SOL)</option> -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dca-amount" class="form-label">Amount (ICP)</label>
+                            <input type="number" class="form-control" id="dca-amount" min="0.1" step="0.1"
+                                placeholder="Enter amount...">
+                        </div>
+                        <button class="btn btn-primary" id="dca-btn">Execute DCA</button>
+
+                        <!-- Coming soon features - commented out for MVP -->
+                        <!--
+                        <hr>
+                        <h6>Schedule Recurring DCA (coming soon)</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Frequency</label>
+                            <select class="form-select" disabled>
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" disabled>Schedule (Coming Soon)</button>
+                        -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column - info display -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Your Balance
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="user-balance">-- ICP</h5>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        Transaction History
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Action</th>
+                                        <th>Asset</th>
+                                        <th>Amount</th>
+                                        <th>Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="action-logs">
+                                    <!-- Action logs will be populated here -->
+                                    <tr>
+                                        <td colspan="4" class="text-center">No transactions yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        Portfolio
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Asset</th>
+                                        <th>Amount</th>
+                                        <th>Value (ICP)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="portfolio">
+                                    <!-- Portfolio will be populated here -->
+                                    <tr>
+                                        <td colspan="3" class="text-center">No assets in portfolio</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-4 mb-5">
+            <p>Built on the <a href="https://internetcomputer.org/" target="_blank">Internet Computer</a> | <a
+                    href="https://github.com/your-username/dca-agent" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Main app code -->
+    <script type="module">
+        // Importing the canister
+        import { dca_agent } from "../../declarations/dca_agent";
+
+        // Global state variables
+        let userBalance = 0;
+        let assetPrices = {
+            "BTC": 0,
+            "ETH": 0,
+            "ICP": 0
+        };
+        let hasInitialDataLoaded = false;
+
+        // Cached DOM elements
+        const depositAmountInput = document.getElementById('deposit-amount');
+        const depositBtn = document.getElementById('deposit-btn');
+        const dcaAssetSelect = document.getElementById('dca-asset');
+        const dcaAmountInput = document.getElementById('dca-amount');
+        const dcaBtn = document.getElementById('dca-btn');
+        const userBalanceEl = document.getElementById('user-balance');
+        const actionLogsEl = document.getElementById('action-logs');
+        const portfolioEl = document.getElementById('portfolio');
+        const btcPriceEl = document.getElementById('btc-price');
+        const ethPriceEl = document.getElementById('eth-price');
+        const icpPriceEl = document.getElementById('icp-price');
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+
+        // Helper function to show notification
+        function showNotification(message, isSuccess = true) {
+            notification.classList.remove('alert-success', 'alert-danger');
+            notification.classList.add(isSuccess ? 'alert-success' : 'alert-danger');
+            notificationMessage.textContent = message;
+            notification.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        // Helper function to display balance
+        function displayBalance(balance) {
+            userBalance = balance;
+            userBalanceEl.textContent = `${balance.toFixed(2)} ICP`;
+        }
+
+        // Helper function to display action logs
+        function displayActionLogs(logs) {
+            if (logs.length === 0) {
+                actionLogsEl.innerHTML = '<tr><td colspan="4" class="text-center">No transactions yet</td></tr>';
+                return;
+            }
+
+            actionLogsEl.innerHTML = '';
+
+            // Sort logs by timestamp (newest first)
+            logs.sort((a, b) => b.timestamp - a.timestamp);
+
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+
+                const actionCell = document.createElement('td');
+                // Check if action has BUY property
+                actionCell.textContent = log.action.hasOwnProperty('BUY') ? 'BUY' : 'HOLD';
+                actionCell.style.fontWeight = log.action.hasOwnProperty('BUY') ? 'bold' : 'normal';
+
+                const assetCell = document.createElement('td');
+                assetCell.textContent = log.asset;
+
+                const amountCell = document.createElement('td');
+                amountCell.textContent = log.amount && log.amount.length > 0 ? log.amount[0].toFixed(4) : '-';
+
+                const reasonCell = document.createElement('td');
+                reasonCell.textContent = log.reason;
+                reasonCell.style.fontSize = '0.9rem'; // Make reason text a bit smaller
+
+                row.appendChild(actionCell);
+                row.appendChild(assetCell);
+                row.appendChild(amountCell);
+                row.appendChild(reasonCell);
+
+                actionLogsEl.appendChild(row);
+            });
+        }
+
+        // Helper function to display portfolio
+        function displayPortfolio(trades) {
+            const portfolio = {};
+
+            // Initialize with ICP balance
+            portfolio["ICP"] = {
+                amount: userBalance,
+                value: userBalance
+            };
+
+            // Add other assets from trades
+            trades.forEach(trade => {
+                if (!portfolio[trade.targetAsset]) {
+                    portfolio[trade.targetAsset] = {
+                        amount: 0,
+                        value: 0
+                    };
+                }
+
+                portfolio[trade.targetAsset].amount += trade.targetAmount;
+                portfolio[trade.targetAsset].value += trade.sourceAmount;
+            });
+
+            // Display portfolio
+            portfolioEl.innerHTML = '';
+
+            // Check if any assets in portfolio
+            const hasAssets = Object.keys(portfolio).some(asset => portfolio[asset].amount > 0);
+
+            if (!hasAssets) {
+                portfolioEl.innerHTML = '<tr><td colspan="3" class="text-center">No assets in portfolio</td></tr>';
+                return;
+            }
+
+            Object.keys(portfolio).forEach(asset => {
+                if (portfolio[asset].amount > 0) {
+                    const row = document.createElement('tr');
+
+                    const assetCell = document.createElement('td');
+                    assetCell.textContent = asset;
+
+                    const amountCell = document.createElement('td');
+                    amountCell.textContent = portfolio[asset].amount.toFixed(4);
+
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = portfolio[asset].value.toFixed(2);
+
+                    row.appendChild(assetCell);
+                    row.appendChild(amountCell);
+                    row.appendChild(valueCell);
+
+                    portfolioEl.appendChild(row);
+                }
+            });
+        }
+
+        // Helper function to update prices
+        async function updatePrices() {
+            try {
+                const btcPrice = await dca_agent.getCurrentPrice("BTC");
+                const ethPrice = await dca_agent.getCurrentPrice("ETH");
+                const icpPrice = await dca_agent.getCurrentPrice("ICP");
+
+                if (btcPrice.length > 0) {
+                    assetPrices.BTC = btcPrice[0];
+                    btcPriceEl.textContent = `$${btcPrice[0].toLocaleString()}`;
+                }
+
+                if (ethPrice.length > 0) {
+                    assetPrices.ETH = ethPrice[0];
+                    ethPriceEl.textContent = `$${ethPrice[0].toLocaleString()}`;
+                }
+
+                if (icpPrice.length > 0) {
+                    assetPrices.ICP = icpPrice[0];
+                    icpPriceEl.textContent = `$${icpPrice[0].toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error("Failed to update prices:", error);
+                // Don't show error to user for price updates, just log it
+            }
+        }
+
+        // Main function to refresh all data
+        async function refreshData() {
+            try {
+                // Show loading indicators if initial load
+                if (!hasInitialDataLoaded) {
+                    btcPriceEl.textContent = "Loading...";
+                    ethPriceEl.textContent = "Loading...";
+                    icpPriceEl.textContent = "Loading...";
+                    userBalanceEl.textContent = "Loading...";
+                }
+
+                // Get user balance
+                const balance = await dca_agent.getBalance();
+                displayBalance(balance);
+
+                // Get user logs
+                const logs = await dca_agent.getUserActionLogs();
+                displayActionLogs(logs);
+
+                // Get user trades for portfolio
+                const trades = await dca_agent.getUserTrades();
+                displayPortfolio(trades);
+
+                // Update asset prices
+                await updatePrices();
+
+                hasInitialDataLoaded = true;
+            } catch (error) {
+                console.error("Failed to refresh data:", error);
+                showNotification("Failed to load data. Please check your connection and try again.", false);
+            }
+        }
+
+        // Deposit button event listener
+        depositBtn.addEventListener('click', async () => {
+            const amount = parseFloat(depositAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Please enter a valid amount greater than 0', false);
+                return;
+            }
+
+            // Disable button to prevent double-clicking
+            depositBtn.disabled = true;
+            depositBtn.textContent = "Processing...";
+
+            try {
+                const result = await dca_agent.deposit(amount);
+                showNotification(result);
+                await refreshData();
+                depositAmountInput.value = '';
+            } catch (error) {
+                console.error("Deposit failed:", error);
+                showNotification('Deposit failed: ' + (error.message || 'Unknown error'), false);
+            } finally {
+                // Re-enable button
+                depositBtn.disabled = false;
+                depositBtn.textContent = "Deposit";
+            }
+        });
+
+        // DCA button event listener
+        dcaBtn.addEventListener('click', async () => {
+            const asset = dcaAssetSelect.value;
+            const amount = parseFloat(dcaAmountInput.value);
+
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Please enter a valid amount greater than 0', false);
+                return;
+            }
+
+            // Make sure we have sufficient balance
+            if (amount > userBalance) {
+                showNotification(`Insufficient balance. You have ${userBalance.toFixed(2)} ICP but tried to use ${amount.toFixed(2)} ICP`, false);
+                return;
+            }
+
+            // Disable button to prevent double-clicking
+            dcaBtn.disabled = true;
+            dcaBtn.textContent = "Processing...";
+
+            try {
+                const result = await dca_agent.executeDCA(asset, amount);
+                showNotification(result);
+                await refreshData();
+                dcaAmountInput.value = '';
+            } catch (error) {
+                console.error("DCA execution failed:", error);
+                showNotification('DCA execution failed: ' + (error.message || 'Unknown error'), false);
+            } finally {
+                // Re-enable button
+                dcaBtn.disabled = false;
+                dcaBtn.textContent = "Execute DCA";
+            }
+        });
+
+        // Keyboard shortcuts for form submissions
+        depositAmountInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                depositBtn.click();
+            }
+        });
+
+        dcaAmountInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                dcaBtn.click();
+            }
+        });
+
+        // Initial data load when page loads
+        window.addEventListener('load', async () => {
+            console.log('DCA Agent frontend loaded! Initializing...');
+            await refreshData();
+
+            // Refresh data every 15 seconds (not 10, to avoid overwhelming the backend)
+            setInterval(refreshData, 15000);
+
+            console.log('Initialization complete!');
+        });
+
+        // FIXME: Remove these debug functions before production
+        /*
+        window.debugDCA = async () => {
+            try {
+                console.log("Debug: Executing test DCA for BTC...");
+                await dca_agent.executeDCA("BTC", 1.0);
+                await refreshData();
+                console.log("Debug: DCA complete!");
+            } catch (e) {
+                console.error("Debug DCA failed:", e);
+            }
+        };
+        
+        window.updateUI = refreshData;
+        */
+    </script>
+</body>
+
+</html>
