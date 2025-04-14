@@ -58,7 +58,7 @@ The agent accepts ICP deposits, monitors price feeds (simulated in this MVP), an
 
 1. Clone the repo and navigate to the project directory
 ```bash
-git clone [https://github.com/Sarthak-006/AI-Powered-DCA-Agent-on-Internet-Computer]
+git clone https://github.com/Sarthak-006/AI-Powered-DCA-Agent-on-Internet-Computer
 cd examples/dca_agent
 ```
 
