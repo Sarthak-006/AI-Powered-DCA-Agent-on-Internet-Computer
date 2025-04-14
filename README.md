@@ -106,20 +106,6 @@ npm start
 - No persistence across canister upgrades (will be added in v0.2)
 - No withdrawal functionality yet (coming soon)
 
-## 🤝 Contributing
-
-Contributions welcome! Feel free to:
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b awesome-feature`)
-3. Commit your changes (`git commit -am 'Add awesome feature'`)
-4. Push to the branch (`git push origin awesome-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is MIT licensed - see the [LICENSE](../../LICENSE) file for details.
-
 ---
 
 *This project is a demo and should not be used for real financial transactions yet. No real tokens are being transferred.*
