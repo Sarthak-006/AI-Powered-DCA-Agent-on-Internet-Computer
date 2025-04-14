@@ -12,7 +12,6 @@ This is a proof-of-concept DCA (Dollar-Cost Averaging) agent that runs entirely 
 
 The agent accepts ICP deposits, monitors price feeds (simulated in this MVP), and makes AI-driven decisions on when to execute trades across multiple assets. All activity is transparently recorded on the blockchain.
 
-![DCA Agent Screenshot](https://placeholder-for-screenshot.png)
 
 ## ✨ Features
 
@@ -51,9 +50,9 @@ The agent accepts ICP deposits, monitors price feeds (simulated in this MVP), an
 
 ### Prerequisites
 
-- [DFINITY SDK (dfx)](https://sdk.dfinity.org/docs/quickstart/local-quickstart.html) version 0.9.3 or later
-- Node.js 14 or later
-- npm 6 or later
+- [DFINITY SDK (dfx)](https://sdk.dfinity.org/docs/quickstart/local-quickstart.html) version 0.26.0 or later
+- Node.js 20 or later
+- npm 8 or later
 
 ### Quick Start
 
@@ -124,5 +123,3 @@ This project is MIT licensed - see the [LICENSE](../../LICENSE) file for details
 ---
 
 *This project is a demo and should not be used for real financial transactions yet. No real tokens are being transferred.*
-
-*Built with ❤️ on the Internet Computer* 
